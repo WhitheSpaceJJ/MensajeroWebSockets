@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script>
+            var ws = null;
+            //funcion que maneja el click del botón enviar
+            function click() {
+                var txtMsjs = document.getElementById("txtMsjs");
+                var txtMsj = document.getElementById("txtMsj");
+                txtMsjs.value += "\n" + "YO: " + txtMsj.value;
+                //aqui se manda el mensaje de la caja de texto al websocket
+                ws.send(txtMsj.value);
+            }
+            //al cargarse la página se ejecuta esta función
+            window.onload = function () {
+                var txtMsjs = document.getElementById("txtMsjs");
+                var btn = document.getElementById("btn");
+                // se asigna el evento del click
+                btn.onclick = click;
+                //hace la conexión al web socket
+                ws = new WebSocket
+                        ("ws://localhost:8080/EjemploWS/websocketendpoint");
+                //la función que se ejecuta al abrirse la conexión
+                ws.onopen = function (evt) {
+                    //se envía este mensaje al websocket
+                    ws.send("Ya me conecté");
+                    txtMsjs.value = "Ya me conecte";
+
+
+
+                };
+
+
+
+                //se asigna y define la función a ejecutarse cada que llegue un mensaje desde el websocket
+                ws.onmessage = function (evt) {
+                    var received_msg = evt.data;
+                    var txtMsjs = document.getElementById("txtMsjs");
+                    try {
+                        let jsonObject = JSON.parse(evt.data);
+                        console.log("La variable es un objeto JSON");
+                    } catch (error) {
+                        console.log("La variable no es un objeto JSON");
+                        txtMsjs.value += "\n" + received_msg;
+                        return;
+                    }
+                    const data = JSON.parse(evt.data);
+                    console.log(data);
+
+                    // Actualizar la tabla con los datos recibidos
+                    const tableBody = document.querySelector('table tbody');
+                    tableBody.innerHTML = '';
+                    for (const cliente of data) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+            <td>${cliente.id}</td>
+            <td><button class="btn btn-primary enviar-mensaje" id="${cliente.id}">Enviar Mensaje</button></td>
+        `;
+                        tableBody.appendChild(row);
+                    }
+
+
+                    // Agregar evento click a los nuevos botones
+                    const botones = document.querySelectorAll(".enviar-mensaje");
+                    botones.forEach(boton => {
+                        boton.addEventListener("click", () => {
+                            alert(`Se ha seleccionado el cliente con ID ${boton.id}`);
+                        });
+                    });
+
+
+                };
+
+                ws.onclose = function () {
+
+                    alert("Connection is closed...");
+                };
+            }
+
+
+
+
+        </script>
+
+
+
+    </head>
+    <body>
+        Mensaje: <input type="text" id="txtMsj" />
+        <input type="button" value="Enviar" id="btn"/>
+        <br/>        
+        Mensajes:
+        <textarea id="txtMsjs"></textarea>        
+
+        <div class="container">
+            <h1>Clientes</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Juan Pérez</td>
+                        <td><button class="btn btn-primary enviar-mensaje" id="1">Enviar Mensaje</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </body>
+</html>
