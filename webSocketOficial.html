@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Envío de Mensajes Sistemas Distribuidos</title>
+    
+<style>
+      /* Estilos CSS para la Envoltura */
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+         
+    h1 {
+        text-align: center;
+        padding: 20px;
+      }
+      /* Estilos CSS para los Divs y Formulario */
+      #div1 {
+        width: 60%;
+        text-align: center;
+        border: 1px solid black;
+        padding: 20px;
+      }
+      
+      #div2 {
+        width: 60%;
+        text-align: center;
+        border: 1px solid black;
+        padding: 20px;
+      }
+      
+      label {
+        display: inline-block;
+        width: 100px;
+        text-align: left;
+      }
+      
+      input[type="text"],
+      textarea {
+        width: 80%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        resize: none;
+      }
+      
+      input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+      
+
+button{
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      
+     
+      select {
+        width: 80%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        background-color: #f8f8f8;
+        font-size: 16px;
+        appearance: none;
+      }
+      
+      #div2 textarea {
+        width: 100%;
+        height: 200px;
+        margin-top: 10px;
+      }
+  /* Estilos CSS para la Tabla */
+      #tabla-mensajes {
+        font-family: Arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+      #tabla-mensajes td, #tabla-mensajes th {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+      
+      #tabla-mensajes tr:nth-child(even){background-color: #f2f2f2;}
+      
+      #tabla-mensajes tr:hover {background-color: #ddd;}
+      
+      #tabla-mensajes th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #4CAF50;
+        color: white;
+      }
+    </style>
+  <script language="javascript" type="text/javascript">
+  var wsUri = "ws://localhost:8080/WebSocket/websocketendpoint";
+  var output;
+  
+  function iniciar(nombre)
+  {
+websocket = new WebSocket(wsUri + "?nombre=" + nombre);
+if(websocket!=null){
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  document.getElementById("boton").disabled = true;
+    document.getElementById("nombre_usuario").disabled = true;
+ document.getElementById("div4").style.display = "block";
+}
+  }
+
+function enviar() {
+  // Obtenemos los valores del formulario
+var nombre=document.getElementById("nombre_usuario").value;
+var asunto = document.getElementById("asunto").value ? document.getElementById("asunto").value : "";
+var remitente = document.getElementById("remitente").value ? document.getElementById("remitente").value : "";
+  var mensaje = document.getElementById("mensaje").value;
+var destinatarioSelect = document.getElementById("destinatario");
+var destinatario = destinatarioSelect.options[destinatarioSelect.selectedIndex].value;
+
+var mensajeJSON = {
+  nombre: nombre,
+  destinatario: destinatario,
+  asunto: asunto,
+  remitente: remitente,
+  mensaje: mensaje
+};
+ 
+
+  // Enviamos el objeto JSON al servidor
+  doSend(JSON.stringify(mensajeJSON));
+}
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED");
+  }
+
+
+function onMessage(evt) {
+  var mensaje = JSON.parse(evt.data);
+  
+  if (mensaje.all_users) {
+ writeToScreen("Usuarios"+evt.data);
+
+    
+  } else {
+    if (mensaje.destinatario === "Todo el Publico") {
+      writeToScreen("Todo el publico"+evt.data);
+    } else {
+ writeToScreen("Mensaje Directo"+evt.data);
+    
+    }
+  }
+}
+
+
+  function onError(evt)
+  {
+    writeToScreen(evt.data);
+  }
+
+  function doSend(message)
+  {
+
+    writeToScreen(message);
+    websocket.send(message);
+  }
+function writeToScreen(message) {
+  var historial = document.getElementById("historial");
+  historial.value += message + "\n";
+}
+function habilitarContenido() {
+  var nombreUsuario = document.getElementById("nombre_usuario").value;
+  if (nombreUsuario != "") {
+iniciar(nombreUsuario);
+  }
+}
+
+
+  </script>
+  </head>
+<body>
+
+
+   <h1>Para habilitar el contenido ingrese su nombre</h1>
+  <div class="wrapper">
+      <div id="div1">
+      <label for="nombre_usuario">Nombre de Usuario:</label>
+      <input type="text" id="nombre_usuario" name="nombre_usuario" placeholder="Introduzca su nombre"><br>
+      <button  id="boton" onclick="habilitarContenido()">Habilitar Contenido</button>
+
+    </div>
+    </div>
+<div id="div4" style="display: none;">
+   <h1>Sistemas Distribuidos</h1>
+  <div class="wrapper">
+      <div id="div1">
+        <h2>Envío de Mensajes</h2>
+      <form onsubmit="enviar(event)">
+          <label for="destinatario">Destinatario:</label>
+         <select id="destinatario" name="destinatario">
+  <option value="Todo el Publico">Todo el Publico</option>
+</select>
+
+          <label for="asunto">Asunto:</label>
+          <input type="text" id="asunto" name="asunto" placeholder="Introduzca el asunto"><br>
+
+          <label for="remitente">Remitente:</label>
+          <input type="text" id="remitente" name="remitente" placeholder="Correo del Remitente"><br>
+
+<label for="mensaje">Mensaje:</label>
+<textarea id="mensaje" name="mensaje" placeholder="Introduzca su mensaje" required></textarea><br>
+
+          <input type="submit" value="Enviar">
+        </form>
+      </div>
+        
+      <div id="div2">
+        <h2>Historial</h2>
+        <textarea id="historial" name="historial" placeholder="Aquí se mostrarán los mensajes recibidos" disabled></textarea>
+    </div>
+  
+<div id="div2">
+    <h2>Mensajes Especificos</h2>
+ <table id="tabla-mensajes">
+    <tr>
+        <th>Nombre del Cliente</th>
+        <th>Asunto</th>
+        <th>Remitente</th>
+        <th>Mensaje</th>
+    </tr>
+</table>
+      </div>
+ 
+</body></html>
