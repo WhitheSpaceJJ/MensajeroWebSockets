@@ -98,6 +98,7 @@ public class WebSocket {
 
     @OnClose
     public void onClose(Session sesion) {
+        
         System.out.println("Close Connection ...");
         //al cerrarse la conexión por parte del cliente se elimina su sesión en el servidor
         clients.remove(sesion);
@@ -134,13 +135,12 @@ public class WebSocket {
                 // Transmitir el mensaje a todos los clientes
                 synchronized (clients) {
                     for (Session client : clients) {
-                        if (!client.equals(session)) {
+
                             try {
                                 client.getBasicRemote().sendText(echoMsg);
                             } catch (IOException ex) {
                                 System.out.println(ex);
                             }
-                        }
                     }
                 }
             } else {

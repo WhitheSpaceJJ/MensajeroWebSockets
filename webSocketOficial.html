@@ -212,9 +212,9 @@ if(mensaje.connected_users[i]===nombre){
 
   function doSend(message)
   {
-
-    writeToScreen(message);
     websocket.send(message);
+var nombre=document.getElementById("nombre_usuario").value;
+iniciar(nombre);
   }
 function writeToScreen(message) {
   var historial = document.getElementById("historial");
