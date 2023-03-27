@@ -213,8 +213,7 @@ if(mensaje.connected_users[i]===nombre){
   function doSend(message)
   {
     websocket.send(message);
-var nombre=document.getElementById("nombre_usuario").value;
-iniciar(nombre);
+
   }
 function writeToScreen(message) {
   var historial = document.getElementById("historial");
@@ -226,8 +225,7 @@ function habilitarContenido() {
 iniciar(nombreUsuario);
   }
 }
-
-
+   
   </script>
   </head>
 <body>
@@ -247,7 +245,7 @@ iniciar(nombreUsuario);
   <div class="wrapper">
       <div id="div1">
         <h2>Envío de Mensajes</h2>
-      <form onsubmit="enviar(event)">
+      
           <label for="destinatario">Destinatario:</label>
          <select id="destinatario" name="destinatario">
   <option value="Todo el Publico">Todo el Publico</option>
@@ -262,8 +260,8 @@ iniciar(nombreUsuario);
 <label for="mensaje">Mensaje:</label>
 <textarea id="mensaje" name="mensaje" placeholder="Introduzca su mensaje" required></textarea><br>
 
-          <input type="submit" value="Enviar">
-        </form>
+              <button onclick="enviarEvento()">Enviar</button>
+    
       </div>
         
       <div id="div2">
@@ -282,5 +280,14 @@ iniciar(nombreUsuario);
     </tr>
 </table>
       </div>
- 
+  <script>
+
+  function enviarEvento()
+  {
+enviar();
+    
+  }
+  
+
+  </script>
 </body></html>
