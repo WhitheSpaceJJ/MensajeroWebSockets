@@ -67,15 +67,16 @@ public class WebSocket {
 
             // enviar la lista de clientes conectados al cliente que se acaba de conectar, excepto al cliente 0 y al cliente recién conectado
             List<String> connectedUsers = new ArrayList<String>(users.keySet());
-            connectedUsers.remove(0); // remover el primer elemento ("servidor")
-          
+        
+
             // Crear un array JSON
             JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-
 // Recorrer la lista de usuarios conectados
             for (String user : connectedUsers) {
                 // Agregar cada usuario al array
-                jsonArrayBuilder.add(user);
+                if(!user.equalsIgnoreCase("servidor")){
+                                    jsonArrayBuilder.add(user);
+                }
             }
 
 // Crear un objeto JSON con el array de usuarios
@@ -83,16 +84,15 @@ public class WebSocket {
                     .add("connected_users", jsonArrayBuilder)
                     .build();
             synchronized (clients) {
-                    for (Session client : clients) {
-
-                            try {
-                                client.getBasicRemote().sendText(json.toString());
-                            } catch (IOException ex) {
-                                System.out.println(ex);
-                            }
-                        
+                for (Session client : clients) {
+                    try {
+                        client.getBasicRemote().sendText(json.toString());
+                    } catch (IOException ex) {
+                        System.out.println(ex);
                     }
+
                 }
+            }
         }
     }
 

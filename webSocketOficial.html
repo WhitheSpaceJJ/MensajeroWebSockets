@@ -166,19 +166,42 @@ var mensajeJSON = {
 
 function onMessage(evt) {
   var mensaje = JSON.parse(evt.data);
-  
-  if (mensaje.all_users) {
- writeToScreen("Usuarios"+evt.data);
 
-    
-  } else {
-    if (mensaje.destinatario === "Todo el Publico") {
-      writeToScreen("Todo el publico"+evt.data);
-    } else {
- writeToScreen("Mensaje Directo"+evt.data);
-    
+  if (mensaje.connected_users) {
+var nombre=document.getElementById("nombre_usuario").value;
+
+    // Si se recibe un mensaje con los usuarios conectados, actualizar la lista de destinatarios en el formulario
+    var selectDestinatario = document.getElementById("destinatario");
+    selectDestinatario.innerHTML = ""; // Limpiar el select
+var optionf = document.createElement("option");
+  optionf.text="Todo el Publico";
+selectDestinatario.add(optionf);
+    for (let i = 0; i < mensaje.connected_users.length; i++) {
+if(mensaje.connected_users[i]===nombre){
+}else{
+      var option = document.createElement("option");
+      option.value = mensaje.connected_users[i];
+
+      option.text = mensaje.connected_users[i];
+      selectDestinatario.add(option);}
     }
-  }
+  } else {
+    // Si se recibe un mensaje directo, mostrarlo en la pantalla
+    if (mensaje.destinatario === "Todo el Publico") {
+      writeToScreen("De; "+mensaje.nombre+" Mensaje;  "+ mensaje.mensaje);
+    } else {
+     var tabla = document.getElementById("tabla-mensajes");
+    var fila = tabla.insertRow(-1);
+    var celdaNombre = fila.insertCell(0);
+    var celdaAsunto = fila.insertCell(1);
+    var celdaRemitente = fila.insertCell(2);
+    var celdaMensaje = fila.insertCell(3);
+    celdaNombre.innerHTML = mensaje.nombre;
+    celdaAsunto.innerHTML = mensaje.asunto;
+    celdaRemitente.innerHTML = mensaje.remitente;
+    celdaMensaje.innerHTML = mensaje.mensaje;
+    }
+  }
 }
 
 
